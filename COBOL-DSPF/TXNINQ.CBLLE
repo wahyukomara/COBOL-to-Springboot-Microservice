@@ -1,0 +1,53 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TXNINQD.
+       
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT TXN-SCREEN ASSIGN TO WORKSTATION-TXNDSP
+                  ORGANIZATION IS TRANSACTION
+                  ACCESS MODE IS SEQUENTIAL
+                  FILE STATUS IS WS-SCR-STATUS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  TXN-SCREEN.
+       01  SCREEN-RECORD   PIC X(200).
+       
+       WORKING-STORAGE SECTION.
+       01  WS-SCR-STATUS   PIC XX.
+       
+       01  WS-INDICATORS.
+           05  IN03        PIC 1 INDICATOR 03.
+           05  IN05        PIC 1 INDICATOR 05.
+           05  IN12        PIC 1 INDICATOR 12.
+           
+       COPY DDS-ALL-FORMATS OF TXNDSP.
+
+       PROCEDURE DIVISION.
+       MAIN-LOGIC.
+           OPEN I-O TXN-SCREEN.
+           
+           PERFORM PROCESS-SCREEN UNTIL IN03 = B"1" OR IN12 = B"1".
+           
+           CLOSE TXN-SCREEN.
+           GOBACK.
+           
+       PROCESS-SCREEN.
+           WRITE SCREEN-RECORD FORMAT "TXNCRS" INDICATORS WS-INDICATORS.
+           READ TXN-SCREEN RECORD FORMAT "TXNCRS" 
+                INDICATORS WS-INDICATORS.
+           
+           IF IN03 = B"0" AND IN12 = B"0"
+               IF IN05 = B"1"
+                   IF TXNID OF TXNCRS-I = SPACES
+                       MOVE 'TRANSACTION ID REQUIRED' TO MSG OF TXNCRS-O
+                   ELSE
+                       MOVE 'ACC-999' TO FROMACCT OF TXNCRS-O
+                       MOVE 'ACC-111' TO TOACCT OF TXNCRS-O
+                       MOVE '150.00' TO TRNAMT OF TXNCRS-O
+                       MOVE 'COMPLETED' TO STATUS OF TXNCRS-O
+                       MOVE 'TRANSACTION RETRIEVED' TO MSG OF TXNCRS-O
+                   END-IF
+               END-IF
+           END-IF.

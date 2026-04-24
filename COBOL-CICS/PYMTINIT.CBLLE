@@ -1,0 +1,61 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PYMTINIC.
+       
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       
+       COPY PYMTMAP.
+       
+       01  WS-LEDGER-PARAMS.
+           05  WS-SRC-ACCT     PIC X(10).
+           05  WS-DEST-ACCT    PIC X(10).
+           05  WS-AMT          PIC S9(13)V99 COMP-3.
+           05  WS-RETURN-MSG   PIC X(50).
+       
+       LINKAGE SECTION.
+       01  DFHCOMMAREA PIC X(100).
+       
+       PROCEDURE DIVISION.
+       MAIN-LOGIC.
+           IF EIBCALEN = 0
+               PERFORM SEND-INITIAL-MAP
+           ELSE
+               PERFORM RECEIVE-MAP-AND-PROCESS
+           END-IF
+           
+           EXEC CICS RETURN END-EXEC.
+
+       SEND-INITIAL-MAP.
+           MOVE LOW-VALUES TO PYMTMAPO
+           EXEC CICS SEND MAP('PYMTMAP') MAPSET('PYMTMAPS') ERASE
+           END-EXEC
+           
+           EXEC CICS RETURN TRANSID('PYMT') END-EXEC.
+           
+       RECEIVE-MAP-AND-PROCESS.
+           EXEC CICS RECEIVE MAP('PYMTMAP') MAPSET('PYMTMAPS') END-EXEC
+           
+           IF EIBAID = DFHPF3 OR EIBAID = DFHPF12
+               EXEC CICS RETURN END-EXEC
+           END-IF
+           
+           IF FROMACCI = SPACES OR TOACCTI = SPACES
+               MOVE 'PLEASE ENTER BOTH ACCOUNTS' TO MESSAGEO
+           ELSE
+      *        Call Ledger Subprogram
+               MOVE FROMACCI TO WS-SRC-ACCT
+               MOVE TOACCTI TO WS-DEST-ACCT
+               MOVE TRNAMTI TO WS-AMT
+               
+               EXEC CICS LINK PROGRAM('LEDGER') 
+                         COMMAREA(WS-LEDGER-PARAMS)
+               END-EXEC
+               
+               MOVE WS-RETURN-MSG TO MESSAGEO
+           END-IF
+           
+           EXEC CICS SEND MAP('PYMTMAP') MAPSET('PYMTMAPS') DATAONLY
+           END-EXEC
+           
+           EXEC CICS RETURN TRANSID('PYMT') END-EXEC.

@@ -1,0 +1,49 @@
+*================================================================
+* MAPSET NAME: TXNMAPS
+* MAP NAME   : TXNMAP
+* DESCRIPTION: Transaction Inquiry Screen (CICS)
+*================================================================
+TXNMAPS  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,TIOAPFX=YES,TERM=3270-2
+TXNMAP   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*
+         DFHMDF POS=(1,30),LENGTH=19,ATTRB=(ASKIP,BRT),                X
+               INITIAL='TRANSACTION INQUIRY'
+*
+         DFHMDF POS=(4,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Transaction ID . . :'
+TXNID    DFHMDF POS=(4,26),LENGTH=15,ATTRB=(UNPROT,IC),                X
+               COLOR=GREEN
+         DFHMDF POS=(4,42),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(7,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Source Account . . :'
+FROMACC  DFHMDF POS=(7,26),LENGTH=10,ATTRB=(ASKIP,BRT),                X
+               COLOR=TURQUOISE
+*
+         DFHMDF POS=(9,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Destination Acct . :'
+TOACCT   DFHMDF POS=(9,26),LENGTH=10,ATTRB=(ASKIP,BRT),                X
+               COLOR=TURQUOISE
+*
+         DFHMDF POS=(11,5),LENGTH=20,ATTRB=ASKIP,                      X
+               INITIAL='Amount . . . . . . :'
+TRNAMT   DFHMDF POS=(11,26),LENGTH=15,ATTRB=(ASKIP,BRT),               X
+               COLOR=TURQUOISE
+*
+         DFHMDF POS=(13,5),LENGTH=20,ATTRB=ASKIP,                      X
+               INITIAL='Status . . . . . . :'
+STATUS   DFHMDF POS=(13,26),LENGTH=10,ATTRB=(ASKIP,BRT),               X
+               COLOR=TURQUOISE
+*
+         DFHMDF POS=(16,5),LENGTH=20,ATTRB=ASKIP,                      X
+               INITIAL='Message  . . . . . :'
+MESSAGE  DFHMDF POS=(16,26),LENGTH=50,ATTRB=(ASKIP,BRT),               X
+               COLOR=RED
+*
+         DFHMDF POS=(23,2),LENGTH=60,ATTRB=ASKIP,                      X
+               INITIAL='F3=Exit  F5=Inquire  F12=Cancel',              X
+               COLOR=BLUE
+*
+         DFHMSD TYPE=FINAL
+         END

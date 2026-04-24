@@ -1,0 +1,34 @@
+     A*================================================================
+     A* DISPLAY FILE: TXNDSP
+     A* DESCRIPTION : Transaction Inquiry Screen (AS/400)
+     A*================================================================
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Inquire')
+     A                                      CA12(12 'Cancel')
+     A*
+     A          R TXNCRS                    BLINK
+     A                                      OVERLAY
+     A                                  1 32'ONLINE BANKING'
+     A                                      COLOR(BLU)
+     A                                  2 30'TRANSACTION INQUIRY'
+     A                                      DSPATR(HI)
+     A                                  5  5'Transaction ID . . :'
+     A            TXNID         15A  B  5 26
+     A                                  7  5'Source Account . . :'
+     A            FROMACCT      10A  O  7 26
+     A                                      COLOR(TRQ)
+     A                                  9  5'Destination Acct . :'
+     A            TOACCT        10A  O  9 26
+     A                                      COLOR(TRQ)
+     A                                 11  5'Amount . . . . . . :'
+     A            TRNAMT        15A  O 11 26
+     A                                      COLOR(TRQ)
+     A                                 13  5'Status . . . . . . :'
+     A            STATUS        10A  O 13 26
+     A                                      COLOR(TRQ)
+     A                                 16  5'Message  . . . . . :'
+     A            MSG           50A  O 16 26
+     A                                      DSPATR(HI) COLOR(RED)
+     A                                 23  2'F3=Exit  F5=Inquire  F12=Cancel'
+     A                                      COLOR(BLU)

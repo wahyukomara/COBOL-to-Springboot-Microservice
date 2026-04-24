@@ -1,0 +1,29 @@
+      A*================================================================
+      A* DISPLAY FILE: CUSTDSP
+      A*================================================================
+      A                                      DSPSIZ(24 80 *DS3)
+      A                                      CA03(03 'Exit')
+      A                                      CF05(05 'Inquire')
+      A                                      CF10(10 'Add')
+      A                                      CA12(12 'Cancel')
+      A*
+      A          R CUSTCRS                   BLINK
+      A                                      OVERLAY
+      A                                  1 32'ONLINE BANKING'
+      A                                      COLOR(BLU)
+      A                                  2 30'CUSTOMER MAINTENANCE'
+      A                                      DSPATR(HI)
+      A                                  5  5'Customer ID  . . . :'
+      A            CUSTID        10A  B  5 26
+      A                                      CHECK(ME)
+      A                                  7  5'First Name . . . . :'
+      A            FNAME         20A  B  7 26
+      A                                  9  5'Last Name  . . . . :'
+      A            LNAME         20A  B  9 26
+      A                                 11  5'Email Address  . . :'
+      A            EMAIL         30A  B 11 26
+      A                                 14  5'Message  . . . . . :'
+      A            MSG           50A  O 14 26
+      A                                      DSPATR(HI) COLOR(RED)
+      A                                 23  2'F3=Exit  F5=Inquire  F10=Add  F12=Cancel'
+      A                                      COLOR(BLU)

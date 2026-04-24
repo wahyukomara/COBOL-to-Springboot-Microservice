@@ -1,0 +1,8 @@
+                R TXNREC
+                  TXNID         10A         COLHDG('Transaction ID')
+                  ACCTID        10A         COLHDG('Account ID')
+                  AMOUNT        15S 2       COLHDG('Amount')
+                  TXNDATE        8S 0       COLHDG('Date YYYYMMDD')
+                  TXNTIME        6S 0       COLHDG('Time HHMMSS')
+                  STATUS         1A         COLHDG('Status')
+                K TXNID

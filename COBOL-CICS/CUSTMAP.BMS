@@ -1,0 +1,47 @@
+*================================================================
+* MAPSET NAME: CUSTMAPS
+* MAP NAME   : CUSTMAP
+* DESCRIPTION: Customer Service Screen (CICS)
+*================================================================
+CUSTMAPS DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,TIOAPFX=YES,TERM=3270-2
+CUSTMAP  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*
+         DFHMDF POS=(1,30),LENGTH=16,ATTRB=(ASKIP,BRT),                X
+               INITIAL='CUSTOMER SERVICE'
+*
+         DFHMDF POS=(4,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Customer ID  . . . :'
+CUSTID   DFHMDF POS=(4,26),LENGTH=10,ATTRB=(UNPROT,IC),                X
+               COLOR=GREEN
+         DFHMDF POS=(4,37),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(6,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='First Name . . . . :'
+FNAME    DFHMDF POS=(6,26),LENGTH=20,ATTRB=UNPROT,                     X
+               COLOR=GREEN
+         DFHMDF POS=(6,47),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(8,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Last Name  . . . . :'
+LNAME    DFHMDF POS=(8,26),LENGTH=20,ATTRB=UNPROT,                     X
+               COLOR=GREEN
+         DFHMDF POS=(8,47),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(10,5),LENGTH=20,ATTRB=ASKIP,                      X
+               INITIAL='Email Address  . . :'
+EMAIL    DFHMDF POS=(10,26),LENGTH=30,ATTRB=UNPROT,                    X
+               COLOR=GREEN
+         DFHMDF POS=(10,57),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(14,5),LENGTH=20,ATTRB=ASKIP,                      X
+               INITIAL='Message  . . . . . :'
+MESSAGE  DFHMDF POS=(14,26),LENGTH=50,ATTRB=(ASKIP,BRT),               X
+               COLOR=RED
+*
+         DFHMDF POS=(23,2),LENGTH=60,ATTRB=ASKIP,                      X
+               INITIAL='F3=Exit  F5=Inquire  F10=Add  F12=Cancel',     X
+               COLOR=BLUE
+*
+         DFHMSD TYPE=FINAL
+         END

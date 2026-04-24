@@ -1,0 +1,40 @@
+*================================================================
+* MAPSET NAME: ACCTMAPS
+* MAP NAME   : ACCTMAP
+* DESCRIPTION: Account Service Screen (CICS)
+*================================================================
+ACCTMAPS DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,TIOAPFX=YES,TERM=3270-2
+ACCTMAP  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*
+         DFHMDF POS=(1,30),LENGTH=15,ATTRB=(ASKIP,BRT),                X
+               INITIAL='ACCOUNT SERVICE'
+*
+         DFHMDF POS=(4,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Account Number . . :'
+ACCTNUM  DFHMDF POS=(4,26),LENGTH=10,ATTRB=(UNPROT,IC),                X
+               COLOR=GREEN
+         DFHMDF POS=(4,37),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(6,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Customer ID  . . . :'
+CUSTID   DFHMDF POS=(6,26),LENGTH=10,ATTRB=UNPROT,                     X
+               COLOR=GREEN
+         DFHMDF POS=(6,37),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(8,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Current Balance  . :'
+BALANCE  DFHMDF POS=(8,26),LENGTH=15,ATTRB=(ASKIP,BRT),                X
+               COLOR=TURQUOISE
+*
+         DFHMDF POS=(14,5),LENGTH=20,ATTRB=ASKIP,                      X
+               INITIAL='Message  . . . . . :'
+MESSAGE  DFHMDF POS=(14,26),LENGTH=50,ATTRB=(ASKIP,BRT),               X
+               COLOR=RED
+*
+         DFHMDF POS=(23,2),LENGTH=60,ATTRB=ASKIP,                      X
+               INITIAL='F3=Exit  F5=Check Bal  F10=Open Acct  F12=Cancel', X
+               COLOR=BLUE
+*
+         DFHMSD TYPE=FINAL
+         END

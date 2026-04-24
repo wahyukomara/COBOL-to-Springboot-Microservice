@@ -1,0 +1,6 @@
+                R CUSTREC
+                  CUSTID        10A         COLHDG('Customer ID')
+                  FNAME         20A         COLHDG('First Name')
+                  LNAME         20A         COLHDG('Last Name')
+                  EMAIL         30A         COLHDG('Email')
+                K CUSTID

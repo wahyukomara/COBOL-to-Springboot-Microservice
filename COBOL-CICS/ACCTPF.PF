@@ -1,0 +1,6 @@
+                R ACCTREC
+                  ACCTNUM       10A         COLHDG('Account Number')
+                  CUSTID        10A         COLHDG('Customer ID')
+                  BALANCE       15S 2       COLHDG('Current Balance')
+                  ACCTYPE        1A         COLHDG('Account Type')
+                K ACCTNUM

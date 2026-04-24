@@ -1,0 +1,29 @@
+     A*================================================================
+     A* DISPLAY FILE: ACCTDSP
+     A* DESCRIPTION : Account Service Screen (AS/400)
+     A*================================================================
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      CA03(03 'Exit')
+     A                                      CF05(05 'Check Bal')
+     A                                      CF10(10 'Open Acct')
+     A                                      CA12(12 'Cancel')
+     A*
+     A          R ACCTCRS                   BLINK
+     A                                      OVERLAY
+     A                                  1 32'ONLINE BANKING'
+     A                                      COLOR(BLU)
+     A                                  2 31'ACCOUNT MAINTENANCE'
+     A                                      DSPATR(HI)
+     A                                  5  5'Account Number . . :'
+     A            ACCTNUM       10A  B  5 26
+     A                                  7  5'Customer ID  . . . :'
+     A            CUSTID        10A  B  7 26
+     A                                  9  5'Current Balance  . :'
+     A            BALANCE       15A  O  9 26
+     A                                      COLOR(TRQ)
+     A                                 14  5'Message  . . . . . :'
+     A            MSG           50A  O 14 26
+     A                                      DSPATR(HI) COLOR(RED)
+     A                                 23  2'F3=Exit  F5=Check Bal  F10=Open Acct  F12=Cancel'
+     A                                      COLOR(BLU)

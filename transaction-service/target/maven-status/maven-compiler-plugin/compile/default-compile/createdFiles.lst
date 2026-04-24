@@ -1,0 +1,5 @@
+com\wkom\banking\transaction\entity\TransactionRecord.class
+com\wkom\banking\transaction\repository\TransactionRepository.class
+com\wkom\banking\transaction\controller\TransactionController.class
+com\wkom\banking\transaction\consumer\TransactionEventConsumer.class
+com\wkom\banking\transaction\TransactionServiceApplication.class

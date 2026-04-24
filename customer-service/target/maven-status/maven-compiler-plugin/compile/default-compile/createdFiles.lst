@@ -1,0 +1,4 @@
+com\wkom\banking\customer\entity\Customer.class
+com\wkom\banking\customer\repository\CustomerRepository.class
+com\wkom\banking\customer\controller\CustomerController.class
+com\wkom\banking\customer\CustomerServiceApplication.class

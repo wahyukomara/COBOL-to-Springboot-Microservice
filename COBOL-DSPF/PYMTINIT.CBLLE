@@ -1,0 +1,60 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PYMTINID.
+       
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT PYMT-SCREEN ASSIGN TO WORKSTATION-PYMTDSP
+                  ORGANIZATION IS TRANSACTION
+                  ACCESS MODE IS SEQUENTIAL
+                  FILE STATUS IS WS-SCR-STATUS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  PYMT-SCREEN.
+       01  SCREEN-RECORD   PIC X(200).
+       
+       WORKING-STORAGE SECTION.
+       01  WS-SCR-STATUS   PIC XX.
+       
+       01  WS-INDICATORS.
+           05  IN03        PIC 1 INDICATOR 03.
+           05  IN12        PIC 1 INDICATOR 12.
+           
+       01  WS-LEDGER-PARAMS.
+           05  WS-SRC-ACCT     PIC X(10).
+           05  WS-DEST-ACCT    PIC X(10).
+           05  WS-AMT          PIC S9(13)V99 COMP-3.
+           05  WS-RETURN-MSG   PIC X(50).
+           
+       COPY DDS-ALL-FORMATS OF PYMTDSP.
+
+       PROCEDURE DIVISION.
+       MAIN-LOGIC.
+           OPEN I-O PYMT-SCREEN.
+           
+           PERFORM PROCESS-SCREEN UNTIL IN03 = B"1" OR IN12 = B"1".
+           
+           CLOSE PYMT-SCREEN.
+           GOBACK.
+           
+       PROCESS-SCREEN.
+           WRITE SCREEN-RECORD FORMAT "PYMTCRS" INDICATORS WS-INDICATORS.
+           READ PYMT-SCREEN RECORD FORMAT "PYMTCRS" 
+                INDICATORS WS-INDICATORS.
+           
+           IF IN03 = B"0" AND IN12 = B"0"
+               IF FROMACCT OF PYMTCRS-I = SPACES OR 
+                  TOACCT OF PYMTCRS-I = SPACES
+                   MOVE 'PLEASE ENTER BOTH ACCOUNTS' TO MSG OF PYMTCRS-O
+               ELSE
+      *            Call Ledger Subprogram
+                   MOVE FROMACCT OF PYMTCRS-I TO WS-SRC-ACCT
+                   MOVE TOACCT OF PYMTCRS-I TO WS-DEST-ACCT
+                   MOVE TRNAMT OF PYMTCRS-I TO WS-AMT
+                   
+                   CALL 'LEDGER' USING WS-LEDGER-PARAMS
+                   
+                   MOVE WS-RETURN-MSG TO MSG OF PYMTCRS-O
+               END-IF
+           END-IF.

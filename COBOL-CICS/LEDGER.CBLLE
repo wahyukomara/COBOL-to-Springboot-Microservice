@@ -1,0 +1,26 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. LEDGER.
+       
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       
+       LINKAGE SECTION.
+       01  LS-LEDGER-PARAMS.
+           05  LS-SRC-ACCT     PIC X(10).
+           05  LS-DEST-ACCT    PIC X(10).
+           05  LS-AMT          PIC S9(13)V99 COMP-3.
+           05  LS-RETURN-MSG   PIC X(50).
+       
+       PROCEDURE DIVISION USING LS-LEDGER-PARAMS.
+       MAIN-LOGIC.
+           IF LS-AMT <= 0
+               MOVE 'INVALID TRANSFER AMOUNT' TO LS-RETURN-MSG
+           ELSE
+      *        In a real scenario, this would EXEC CICS READ UPDATE
+      *        the ACCOUNT.PF and WRITE to LEDGER.PF
+               MOVE 'TRANSFER SUCCESSFUL (LEDGER UPDATED)' 
+                    TO LS-RETURN-MSG
+           END-IF
+           
+           EXEC CICS RETURN END-EXEC.

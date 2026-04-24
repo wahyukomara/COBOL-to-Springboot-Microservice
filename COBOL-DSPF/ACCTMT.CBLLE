@@ -1,0 +1,107 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ACCTMT.
+       
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT ACCT-SCREEN ASSIGN TO WORKSTATION-ACCTDSP
+                  ORGANIZATION IS TRANSACTION
+                  ACCESS MODE IS SEQUENTIAL
+                  FILE STATUS IS WS-SCR-STATUS.
+                  
+
+           SELECT ACCT-FILE ASSIGN TO DATABASE-ACCTPF
+                  ORGANIZATION IS INDEXED
+                  ACCESS MODE IS DYNAMIC
+                  RECORD KEY IS ACCTNUM OF ACCT-REC WITH DUPLICATES
+                  FILE STATUS IS WS-DB-STATUS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  ACCT-SCREEN.
+       01  SCREEN-RECORD   PIC X(200).
+
+       FD  ACCT-FILE.
+       01  ACCT-REC.
+           COPY DDS-ALL-FORMATS OF ACCTPF.
+       
+       WORKING-STORAGE SECTION.
+       01  WS-STATUS       PIC XX.
+       01  WS-SCR-STATUS   PIC XX.
+        
+       01  ACCTCRS-I-INDIC.
+           05  IN03        PIC 1 INDICATOR 03.
+           05  IN05        PIC 1 INDICATOR 05.
+           05  IN10        PIC 1 INDICATOR 10.
+           05  IN12        PIC 1 INDICATOR 12.
+           05  FILLER      PIC X(95).
+       
+       01  WS-DISPLAY-BAL  PIC Z,ZZZ,ZZZ,ZZ9.99.
+
+       01  ACCT-REC-AREA.
+           COPY DDS-ALL-FORMATS OF ACCTDSP.
+
+       PROCEDURE DIVISION.
+       MAIN-LOGIC.
+           OPEN I-O ACCT-SCREEN.
+           OPEN I-O ACCT-FILE.
+           
+           PERFORM PROCESS-SCREEN UNTIL IN03 = B"1" OR IN12 = B"1".
+           
+           CLOSE ACCT-SCREEN.
+           CLOSE ACCT-FILE.
+           GOBACK.
+           
+       PROCESS-SCREEN.
+           WRITE SCREEN-RECORD FORMAT "ACCTCRS"
+                 INDICATORS ACCTCRS-I-INDIC.
+           READ ACCT-SCREEN RECORD FORMAT "ACCTCRS" 
+                INDICATORS ACCTCRS-I-INDIC
+                AT END CONTINUE
+           END-READ.
+           
+           IF IN03 = B"0" AND IN12 = B"0"
+               EVALUATE TRUE
+                   WHEN IN05 = B"1"
+                       PERFORM CHECK-BALANCE
+                   WHEN IN10 = B"1"
+                       PERFORM OPEN-ACCOUNT
+               END-EVALUATE
+           END-IF.
+
+       CHECK-BALANCE.
+           IF ACCTNUM OF ACCTCRS-I = SPACES
+               MOVE "ACCOUNT NUMBER REQUIRED FOR BALANCE" 
+                    TO MSG OF ACCTCRS-O
+           ELSE
+               MOVE ACCTNUM OF ACCTCRS-I TO ACCTNUM OF ACCT-REC
+               READ ACCT-FILE
+                   INVALID KEY
+                       MOVE "ACCOUNT NOT FOUND" TO MSG OF ACCTCRS-O
+                   NOT INVALID KEY
+                       MOVE BALANCE OF ACCT-REC TO WS-DISPLAY-BAL
+                       MOVE WS-DISPLAY-BAL TO BALANCE OF ACCTCRS-O
+                       MOVE "BALANCE RETRIEVED" TO MSG OF ACCTCRS-O
+               END-READ
+           END-IF.
+
+       OPEN-ACCOUNT.
+           IF ACCTNUM OF ACCTCRS-I = SPACES OR 
+              CUSTID OF ACCTCRS-I = SPACES
+               MOVE "ACCOUNT NUMBER AND CUSTOMER ID REQUIRED" 
+                    TO MSG OF ACCTCRS-O
+           ELSE
+               MOVE ACCTNUM OF ACCTCRS-I TO ACCTNUM OF ACCT-REC
+               MOVE CUSTID OF ACCTCRS-I TO CUSTID OF ACCT-REC
+               MOVE 0 TO BALANCE OF ACCT-REC
+               MOVE "S" TO ACCTYPE OF ACCT-REC
+               
+               WRITE ACCT-REC
+                   INVALID KEY
+                       MOVE "ACCOUNT ALREADY EXISTS" 
+                            TO MSG OF ACCTCRS-O
+                   NOT INVALID KEY
+                       MOVE "ACCOUNT OPENED SUCCESSFULLY" 
+                            TO MSG OF ACCTCRS-O
+               END-WRITE
+           END-IF.

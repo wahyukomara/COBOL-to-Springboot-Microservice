@@ -1,0 +1,17 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: authorisation-service
+  threads:
+    virtual:
+      enabled: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+jwt:
+  secret: defaultSecretKeyWithAtLeast32CharactersForHmacSha256

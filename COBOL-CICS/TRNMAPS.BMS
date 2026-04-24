@@ -1,0 +1,43 @@
+*================================================================
+* MAPSET NAME: TRNMAPS
+* MAP NAME   : TRNMAP
+* DESCRIPTION: Fund Transfer Screen for CICS 3270
+*================================================================
+TRNMAPS  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,TIOAPFX=YES,TERM=3270-2
+TRNMAP   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*
+         DFHMDF POS=(1,30),LENGTH=14,ATTRB=(ASKIP,BRT),                X
+               INITIAL='ONLINE BANKING'
+         DFHMDF POS=(2,28),LENGTH=20,ATTRB=(ASKIP,BRT),                X
+               INITIAL='FUND TRANSFER SYSTEM'
+*
+         DFHMDF POS=(5,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Source Account . . :'
+FROMACC  DFHMDF POS=(5,26),LENGTH=10,ATTRB=(UNPROT,IC),                X
+               COLOR=GREEN
+         DFHMDF POS=(5,37),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(7,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Destination Account:'
+TOACCT   DFHMDF POS=(7,26),LENGTH=10,ATTRB=UNPROT,                     X
+               COLOR=GREEN
+         DFHMDF POS=(7,37),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(9,5),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='Transfer Amount  . :'
+TRNAMT   DFHMDF POS=(9,26),LENGTH=15,ATTRB=(UNPROT,NUM),               X
+               COLOR=GREEN
+         DFHMDF POS=(9,42),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(14,5),LENGTH=20,ATTRB=ASKIP,                      X
+               INITIAL='Message . . . . . .:'
+MESSAGE  DFHMDF POS=(14,26),LENGTH=50,ATTRB=(ASKIP,BRT),               X
+               COLOR=RED
+*
+         DFHMDF POS=(23,2),LENGTH=45,ATTRB=ASKIP,                      X
+               INITIAL='PF3=Exit   PF12=Cancel   Enter=Submit',        X
+               COLOR=BLUE
+*
+         DFHMSD TYPE=FINAL
+         END

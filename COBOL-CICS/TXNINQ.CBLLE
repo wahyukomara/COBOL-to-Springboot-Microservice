@@ -1,0 +1,53 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TXNINQC.
+       
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       
+       COPY TXNMAP.
+       
+       LINKAGE SECTION.
+       01  DFHCOMMAREA PIC X(100).
+       
+       PROCEDURE DIVISION.
+       MAIN-LOGIC.
+           IF EIBCALEN = 0
+               PERFORM SEND-INITIAL-MAP
+           ELSE
+               PERFORM RECEIVE-MAP-AND-PROCESS
+           END-IF
+           
+           EXEC CICS RETURN END-EXEC.
+
+       SEND-INITIAL-MAP.
+           MOVE LOW-VALUES TO TXNMAPO
+           EXEC CICS SEND MAP('TXNMAP') MAPSET('TXNMAPS') ERASE
+           END-EXEC
+           
+           EXEC CICS RETURN TRANSID('TXNI') END-EXEC.
+           
+       RECEIVE-MAP-AND-PROCESS.
+           EXEC CICS RECEIVE MAP('TXNMAP') MAPSET('TXNMAPS') END-EXEC
+           
+           IF EIBAID = DFHPF3 OR EIBAID = DFHPF12
+               EXEC CICS RETURN END-EXEC
+           END-IF
+           
+           IF EIBAID = DFHPF5
+               IF TXNIDI = SPACES
+                   MOVE 'TRANSACTION ID REQUIRED' TO MESSAGEO
+               ELSE
+      *            Simulate retrieval
+                   MOVE 'ACC-999' TO FROMACCO
+                   MOVE 'ACC-111' TO TOACCTO
+                   MOVE '150.00' TO TRNAMTO
+                   MOVE 'COMPLETED' TO STATUSO
+                   MOVE 'TRANSACTION RETRIEVED' TO MESSAGEO
+               END-IF
+           END-IF
+           
+           EXEC CICS SEND MAP('TXNMAP') MAPSET('TXNMAPS') DATAONLY
+           END-EXEC
+           
+           EXEC CICS RETURN TRANSID('TXNI') END-EXEC.

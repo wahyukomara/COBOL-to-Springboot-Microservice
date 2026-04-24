@@ -1,0 +1,94 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CUSTMTC.
+       
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       
+       01  WS-CUST-REC.
+           COPY DDS-ALL-FORMATS OF CUSTPF.
+       
+       COPY CUSTMAP.
+       
+       LINKAGE SECTION.
+       01  DFHCOMMAREA PIC X(100).
+       
+       PROCEDURE DIVISION.
+       MAIN-LOGIC.
+           IF EIBCALEN = 0
+               PERFORM SEND-INITIAL-MAP
+           ELSE
+               PERFORM RECEIVE-MAP-AND-PROCESS
+           END-IF
+           
+           EXEC CICS RETURN END-EXEC.
+ 
+       SEND-INITIAL-MAP.
+           MOVE LOW-VALUES TO CUSTMAPO
+           EXEC CICS SEND MAP('CUSTMAP') MAPSET('CUSTMAPS') ERASE
+           END-EXEC
+           
+           EXEC CICS RETURN TRANSID('CUST') END-EXEC.
+           
+       RECEIVE-MAP-AND-PROCESS.
+           EXEC CICS RECEIVE MAP('CUSTMAP') MAPSET('CUSTMAPS') END-EXEC
+           
+           IF EIBAID = DFHPF3 OR EIBAID = DFHPF12
+               EXEC CICS RETURN END-EXEC
+           END-IF
+           
+           EVALUATE EIBAID
+               WHEN DFHPF10
+                   PERFORM ADD-CUSTOMER
+               WHEN DFHPF5
+                   PERFORM INQUIRE-CUSTOMER
+           END-EVALUATE
+           
+           EXEC CICS SEND MAP('CUSTMAP') MAPSET('CUSTMAPS') DATAONLY
+           END-EXEC
+           
+           EXEC CICS RETURN TRANSID('CUST') END-EXEC.
+
+       INQUIRE-CUSTOMER.
+           IF CUSTIDI = SPACES
+               MOVE 'CUSTOMER ID REQUIRED FOR INQUIRY' TO MESSAGEO
+           ELSE
+               EXEC CICS READ
+                   FILE('CUSTPF')
+                   RIDFLD(CUSTIDI)
+                   INTO(WS-CUST-REC)
+                   RESP(EIBRESP)
+               END-EXEC
+               
+               IF EIBRESP = DFHRESP(NORMAL)
+                   MOVE FNAME OF WS-CUST-REC TO FNAMEO
+                   MOVE LNAME OF WS-CUST-REC TO LNAMEO
+                   MOVE EMAIL OF WS-CUST-REC TO EMAILO
+                   MOVE 'RECORD RETRIEVED' TO MESSAGEO
+               ELSE
+                   MOVE 'CUSTOMER NOT FOUND' TO MESSAGEO
+               END-IF
+           END-IF.
+
+       ADD-CUSTOMER.
+           IF CUSTIDI = SPACES OR FNAMEI = SPACES OR LNAMEI = SPACES
+               MOVE 'ALL FIELDS ARE REQUIRED TO ADD' TO MESSAGEO
+           ELSE
+               MOVE CUSTIDI TO CUSTID OF WS-CUST-REC
+               MOVE FNAMEI TO FNAME OF WS-CUST-REC
+               MOVE LNAMEI TO LNAME OF WS-CUST-REC
+               MOVE EMAILI TO EMAIL OF WS-CUST-REC
+               
+               EXEC CICS WRITE
+                   FILE('CUSTPF')
+                   FROM(WS-CUST-REC)
+                   RIDFLD(CUSTID OF WS-CUST-REC)
+                   RESP(EIBRESP)
+               END-EXEC
+               
+               IF EIBRESP = DFHRESP(NORMAL)
+                   MOVE 'CUSTOMER RECORD ADDED SUCCESSFULLY' TO MESSAGEO
+               ELSE
+                   MOVE 'CUSTOMER ID ALREADY EXISTS' TO MESSAGEO
+               END-IF
+           END-IF.

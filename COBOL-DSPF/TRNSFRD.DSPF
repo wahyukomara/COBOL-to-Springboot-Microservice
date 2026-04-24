@@ -1,0 +1,28 @@
+     A*================================================================
+     A* DISPLAY FILE: TRNSFRD
+     A* DESCRIPTION : Fund Transfer Screen for AS/400 5250
+     A*================================================================
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CA03(03 'Exit')
+     A                                      CA12(12 'Cancel')
+     A*
+     A          R TRNSCRS                   BLINK
+     A                                      OVERLAY
+     A                                  1 30'ONLINE BANKING'
+     A                                      COLOR(BLU)
+     A                                  2 28'FUND TRANSFER SYSTEM'
+     A                                      DSPATR(HI)
+     A                                  5  5'Source Account . . :'
+     A            FROMACCT      10A  B  5 26
+     A                                      CHECK(ME)
+     A                                  7  5'Destination Account:'
+     A            TOACCT        10A  B  7 26
+     A                                      CHECK(ME)
+     A                                  9  5'Transfer Amount  . :'
+     A            TRNAMT        15Y 2B  9 26
+     A                                      EDTCDE(4)
+     A                                 14  5'Message . . . . . .:'
+     A            MSG           50A  O 14 26
+     A                                      DSPATR(HI) COLOR(RED)
+     A                                 23  2'F3=Exit   F12=Cancel   Enter=Submit'
+     A                                      COLOR(BLU)

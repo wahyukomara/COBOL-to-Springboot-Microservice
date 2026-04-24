@@ -1,0 +1,99 @@
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. CUSTMT.
+
+        ENVIRONMENT DIVISION.
+        INPUT-OUTPUT SECTION.
+        FILE-CONTROL.
+            SELECT CUST-SCREEN ASSIGN TO WORKSTATION-CUSTDSP
+                   ORGANIZATION IS TRANSACTION
+                   ACCESS MODE IS SEQUENTIAL
+                   FILE STATUS IS WS-STATUS.
+
+            SELECT CUST-FILE ASSIGN TO DATABASE-CUSTPF
+                   ORGANIZATION IS INDEXED
+                   ACCESS MODE IS DYNAMIC
+                   RECORD KEY IS CUSTID OF CUST-REC WITH DUPLICATES
+                   FILE STATUS IS WS-DB-STATUS.
+
+        DATA DIVISION.
+        FILE SECTION.
+        FD  CUST-SCREEN.
+        01  SCREEN-RECORD   PIC X(200).
+
+        FD  CUST-FILE.
+        01  CUST-REC.
+            COPY DDS-ALL-FORMATS OF CUSTPF.
+
+        WORKING-STORAGE SECTION.
+        01  WS-STATUS       PIC XX.
+        01  WS-DB-STATUS    PIC XX.
+
+        01  CUST-REC-AREA.
+            COPY DDS-ALL-FORMATS OF CUSTDSP.
+
+        PROCEDURE DIVISION.
+        MAIN-LOGIC.
+            OPEN I-O CUST-SCREEN.
+            OPEN I-O CUST-FILE.
+
+            PERFORM PROCESS-SCREEN UNTIL IN03 = B"1" OR IN12 = B"1".
+
+            CLOSE CUST-SCREEN.
+            CLOSE CUST-FILE.
+            GOBACK.
+
+        PROCESS-SCREEN.
+            WRITE SCREEN-RECORD FORMAT "CUSTCRS"
+                  INDICATORS CUSTCRS-I-INDIC.
+            READ CUST-SCREEN RECORD FORMAT "CUSTCRS"
+                 INDICATORS CUSTCRS-I-INDIC
+                 AT END CONTINUE
+            END-READ.
+
+            IF IN03 = B"0" AND IN12 = B"0"
+                EVALUATE TRUE
+                    WHEN IN05 = B"1"
+                        PERFORM INQUIRE-CUSTOMER
+                    WHEN IN10 = B"1"
+                        PERFORM ADD-CUSTOMER
+                END-EVALUATE
+            END-IF.
+
+        INQUIRE-CUSTOMER.
+            IF CUSTID OF CUSTCRS-I = SPACES
+                MOVE "CUSTOMER ID REQUIRED FOR INQUIRY"
+                     TO MSG OF CUSTCRS-O
+            ELSE
+                MOVE CUSTID OF CUSTCRS-I TO CUSTID OF CUST-REC
+                READ CUST-FILE
+                    INVALID KEY
+                        MOVE "CUSTOMER NOT FOUND" TO MSG OF CUSTCRS-O
+                    NOT INVALID KEY
+                        MOVE FNAME OF CUST-REC TO FNAME OF CUSTCRS-O
+                        MOVE LNAME OF CUST-REC TO LNAME OF CUSTCRS-O
+                        MOVE EMAIL OF CUST-REC TO EMAIL OF CUSTCRS-O
+                        MOVE "RECORD RETRIEVED" TO MSG OF CUSTCRS-O
+                END-READ
+            END-IF.
+
+        ADD-CUSTOMER.
+            IF CUSTID OF CUSTCRS-I = SPACES OR
+               FNAME OF CUSTCRS-I = SPACES OR
+               LNAME OF CUSTCRS-I = SPACES
+                MOVE "ALL FIELDS ARE REQUIRED TO ADD"
+                     TO MSG OF CUSTCRS-O
+            ELSE
+                MOVE CUSTID OF CUSTCRS-I TO CUSTID OF CUST-REC
+                MOVE FNAME OF CUSTCRS-I TO FNAME OF CUST-REC
+                MOVE LNAME OF CUSTCRS-I TO LNAME OF CUST-REC
+                MOVE EMAIL OF CUSTCRS-I TO EMAIL OF CUST-REC
+
+                WRITE CUST-REC
+                    INVALID KEY
+                        MOVE "CUSTOMER ID ALREADY EXISTS"
+                             TO MSG OF CUSTCRS-O
+                    NOT INVALID KEY
+                        MOVE "CUSTOMER RECORD ADDED SUCCESSFULLY"
+                             TO MSG OF CUSTCRS-O
+                END-WRITE
+            END-IF.

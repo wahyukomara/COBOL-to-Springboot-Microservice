@@ -1,0 +1,2 @@
+com\wkom\banking\security\CommonSecurityConfig.class
+com\wkom\banking\security\JwtValidationFilter.class

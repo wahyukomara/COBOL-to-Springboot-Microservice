@@ -1,0 +1,4 @@
+com\wkom\banking\ledger\repository\LedgerRepository.class
+com\wkom\banking\ledger\consumer\PaymentEventConsumer.class
+com\wkom\banking\ledger\entity\LedgerEntry.class
+com\wkom\banking\ledger\LedgerServiceApplication.class

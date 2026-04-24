@@ -1,0 +1,5 @@
+com\wkom\banking\accounts\controller\AccountController.class
+com\wkom\banking\accounts\consumer\LedgerEventConsumer.class
+com\wkom\banking\accounts\entity\Account.class
+com\wkom\banking\accounts\repository\AccountRepository.class
+com\wkom\banking\accounts\AccountsServiceApplication.class

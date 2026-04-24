@@ -1,0 +1,2 @@
+com\wkom\banking\events\PaymentInitiatedEvent.class
+com\wkom\banking\events\LedgerUpdatedEvent.class

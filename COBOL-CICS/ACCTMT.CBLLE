@@ -1,0 +1,95 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ACCTMTC.
+       
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       
+       01  WS-ACCT-REC.
+           COPY DDS-ALL-FORMATS OF ACCTPF.
+       
+       01  WS-DISPLAY-BAL  PIC Z,ZZZ,ZZZ,ZZ9.99.
+       
+       COPY ACCTMAP.
+       
+       LINKAGE SECTION.
+       01  DFHCOMMAREA PIC X(100).
+       
+       PROCEDURE DIVISION.
+       MAIN-LOGIC.
+           IF EIBCALEN = 0
+               PERFORM SEND-INITIAL-MAP
+           ELSE
+               PERFORM RECEIVE-MAP-AND-PROCESS
+           END-IF
+           
+           EXEC CICS RETURN END-EXEC.
+ 
+       SEND-INITIAL-MAP.
+           MOVE LOW-VALUES TO ACCTMAPO
+           EXEC CICS SEND MAP('ACCTMAP') MAPSET('ACCTMAPS') ERASE
+           END-EXEC
+           
+           EXEC CICS RETURN TRANSID('ACCT') END-EXEC.
+           
+       RECEIVE-MAP-AND-PROCESS.
+           EXEC CICS RECEIVE MAP('ACCTMAP') MAPSET('ACCTMAPS') END-EXEC
+           
+           IF EIBAID = DFHPF3 OR EIBAID = DFHPF12
+               EXEC CICS RETURN END-EXEC
+           END-IF
+           
+           EVALUATE EIBAID
+               WHEN DFHPF10
+                   PERFORM OPEN-ACCOUNT
+               WHEN DFHPF5
+                   PERFORM CHECK-BALANCE
+           END-EVALUATE
+           
+           EXEC CICS SEND MAP('ACCTMAP') MAPSET('ACCTMAPS') DATAONLY
+           END-EXEC
+           
+           EXEC CICS RETURN TRANSID('ACCT') END-EXEC.
+
+       CHECK-BALANCE.
+           IF ACCTNUMI = SPACES
+               MOVE 'ACCOUNT NUMBER REQUIRED FOR BALANCE' TO MESSAGEO
+           ELSE
+               EXEC CICS READ
+                   FILE('ACCTPF')
+                   RIDFLD(ACCTNUMI)
+                   INTO(WS-ACCT-REC)
+                   RESP(EIBRESP)
+               END-EXEC
+               
+               IF EIBRESP = DFHRESP(NORMAL)
+                   MOVE BALANCE OF WS-ACCT-REC TO WS-DISPLAY-BAL
+                   MOVE WS-DISPLAY-BAL TO BALANCEO
+                   MOVE 'BALANCE RETRIEVED' TO MESSAGEO
+               ELSE
+                   MOVE 'ACCOUNT NOT FOUND' TO MESSAGEO
+               END-IF
+           END-IF.
+
+       OPEN-ACCOUNT.
+           IF ACCTNUMI = SPACES OR CUSTIDI = SPACES
+               MOVE 'ACCOUNT NUMBER AND CUSTOMER ID REQUIRED' TO MESSAGEO
+           ELSE
+               MOVE ACCTNUMI TO ACCTNUM OF WS-ACCT-REC
+               MOVE CUSTIDI TO CUSTID OF WS-ACCT-REC
+               MOVE 0 TO BALANCE OF WS-ACCT-REC
+               MOVE 'S' TO ACCTYPE OF WS-ACCT-REC
+               
+               EXEC CICS WRITE
+                   FILE('ACCTPF')
+                   FROM(WS-ACCT-REC)
+                   RIDFLD(ACCTNUM OF WS-ACCT-REC)
+                   RESP(EIBRESP)
+               END-EXEC
+               
+               IF EIBRESP = DFHRESP(NORMAL)
+                   MOVE 'ACCOUNT OPENED SUCCESSFULLY' TO MESSAGEO
+               ELSE
+                   MOVE 'ACCOUNT ALREADY EXISTS' TO MESSAGEO
+               END-IF
+           END-IF.

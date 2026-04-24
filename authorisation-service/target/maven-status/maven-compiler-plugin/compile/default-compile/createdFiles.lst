@@ -1,0 +1,3 @@
+com\wkom\banking\auth\controller\AuthController.class
+com\wkom\banking\auth\AuthorisationServiceApplication.class
+com\wkom\banking\auth\controller\LoginRequest.class
